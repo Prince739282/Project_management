@@ -10,6 +10,16 @@ function ProjectDetails() {
   const [error, setError] = useState("");
   const [members, setMembers] = useState([]);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [tasks, setTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    description: "",
+    assignedTo: "",
+    status: "todo",
+  });
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -41,10 +51,53 @@ function ProjectDetails() {
         setMembersLoading(false);
       }
     };
+    const fetchTasks = async () => {
+      try {
+        const response = await api.get(`/tasks/${projectId}`);
+
+        console.log("Tasks:", response.data);
+
+        setTasks(response.data.data || []);
+      } catch (error) {
+        console.log("Tasks error:", error);
+      } finally {
+        setTasksLoading(false);
+      }
+    };
 
     fetchProject();
     fetchMembers();
+    fetchTasks();
   }, [projectId]);
+
+  const handleTaskChange = (e) => {
+    setTaskForm({
+      ...taskForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const createTask = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await api.post(`/tasks/${projectId}`, taskForm);
+
+      console.log("Task created:", response.data);
+
+      setTasks([...tasks, response.data.data]);
+
+      setTaskForm({
+        title: "",
+        description: "",
+        assignedTo: "",
+        status: "todo",
+      });
+
+      setShowTaskForm(false);
+    } catch (error) {
+      console.log("Create task error:", error);
+    }
+  };
 
   if (loading) {
     return <p className="p-6">Loading project...</p>;
@@ -85,6 +138,103 @@ function ProjectDetails() {
                 </div>
 
                 <span className="text-blue-600 font-medium">{member.role}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Tasks */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Tasks</h2>
+
+          <button
+            onClick={() => setShowTaskForm(!showTaskForm)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            {showTaskForm ? "Cancel" : "+ Create Task"}
+          </button>
+        </div>
+
+        {/* Create Task Form */}
+        {showTaskForm && (
+          <form onSubmit={createTask} className="border rounded-md p-4 mb-6">
+            <input
+              type="text"
+              name="title"
+              placeholder="Task title"
+              value={taskForm.title}
+              onChange={handleTaskChange}
+              required
+              className="w-full border rounded-md p-2 mb-3"
+            />
+
+            <textarea
+              name="description"
+              placeholder="Task description"
+              value={taskForm.description}
+              onChange={handleTaskChange}
+              className="w-full border rounded-md p-2 mb-3"
+            />
+
+            <select
+              name="assignedTo"
+              value={taskForm.assignedTo}
+              onChange={handleTaskChange}
+              className="w-full border rounded-md p-2 mb-3"
+            >
+              <option value="">Assign to member</option>
+
+              {members.map((member) => (
+                <option key={member.user?._id} value={member.user?._id}>
+                  {member.user?.fullName || member.user?.username}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="status"
+              value={taskForm.status}
+              onChange={handleTaskChange}
+              className="w-full border rounded-md p-2 mb-3"
+            >
+              <option value="todo">Todo</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+
+            <button
+              type="submit"
+              className="bg-green-600 text-white px-4 py-2 rounded-md"
+            >
+              Create Task
+            </button>
+          </form>
+        )}
+
+        {/* Task List */}
+        {tasksLoading ? (
+          <p className="text-gray-500">Loading tasks...</p>
+        ) : tasks.length === 0 ? (
+          <p className="text-gray-500">No tasks yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {tasks.map((task) => (
+              <div key={task._id} className="border rounded-md p-4">
+                <h3 className="font-semibold text-lg">{task.title}</h3>
+
+                <p className="text-gray-600 mt-1">{task.description}</p>
+
+                <p className="text-sm text-blue-600 mt-2">
+                  Status: {task.status}
+                </p>
+
+                {task.assignedTo && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Assigned to:{" "}
+                    {task.assignedTo.fullName || task.assignedTo.username}
+                  </p>
+                )}
               </div>
             ))}
           </div>
