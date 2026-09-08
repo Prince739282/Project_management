@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-function Login() {
+function CreateProject() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    name: "",
+    description: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -27,29 +27,24 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", formData);
+      const response = await api.post("/projects/", formData);
 
-      console.log("Login response:", response.data);
-
-      const accessToken = response.data.data.accessToken;
-
-      localStorage.setItem("accessToken", accessToken);
+      console.log("Project created:", response.data);
 
       navigate("/dashboard");
     } catch (error) {
-      console.log("Login error:", error);
-      console.log("Response:", error.response);
+      console.log("Create project error:", error);
 
-      setError(error.response?.data?.message || "Invalid email or password");
+      setError(error.response?.data?.message || "Failed to create project");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold mb-6">Create Project</h1>
 
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-md">
@@ -57,30 +52,30 @@ function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block mb-1 font-medium">Email</label>
+            <label className="block mb-1 font-medium">Project Name</label>
 
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              name="name"
+              value={formData.name}
               onChange={handleChange}
-              placeholder="Enter your email"
+              placeholder="Enter project name"
               required
               className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Password</label>
+            <label className="block mb-1 font-medium">Description</label>
 
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
+            <textarea
+              name="description"
+              value={formData.description}
               onChange={handleChange}
-              placeholder="Enter your password"
+              placeholder="Enter project description"
+              rows="5"
               required
               className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -91,22 +86,12 @@ function Login() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Creating..." : "Create Project"}
           </button>
         </form>
-
-        <p className="text-center mt-4 text-gray-600">
-          Don't have an account?{" "}
-          <button
-            onClick={() => navigate("/signup")}
-            className="text-blue-600 hover:underline"
-          >
-            Sign Up
-          </button>
-        </p>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default CreateProject;

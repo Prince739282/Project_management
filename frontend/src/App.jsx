@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import CreateProject from "./pages/CreateProject";
+
 function App() {
   return (
     <Routes>
@@ -9,6 +11,7 @@ function App() {
       <Route path="/login" element={<Login Page />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/projects/create" element={<CreateProject />} />
       <Route path="/projects" element={<h1>Projects Page</h1>} />
       <Route path="/profile" element={<h1>Profile Page</h1>} />
     </Routes>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -11,12 +13,14 @@ function Dashboard() {
       try {
         const response = await api.get("/projects/");
 
-        console.log("Projects:", response.data);
+        console.log("Full response:", response.data);
+        console.log("Projects data:", response.data.data);
+        console.log("First project ID:", response.data.data?.[0]?._id);
+        console.log("First project:", response.data.data?.[0]);
 
         setProjects(response.data.data || []);
       } catch (error) {
         console.log("Projects error:", error);
-
         setError(error.response?.data?.message || "Failed to load projects");
       } finally {
         setLoading(false);
@@ -83,7 +87,10 @@ function Dashboard() {
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-xl font-bold">Recent Projects</h3>
 
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            <button
+              onClick={() => navigate("/projects/create")}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            >
               + New Project
             </button>
           </div>
@@ -100,11 +107,17 @@ function Dashboard() {
 
           {!loading && !error && projects.length > 0 && (
             <div className="space-y-3">
-              {projects.map((project) => (
-                <div key={project._id} className="border rounded-md p-4">
-                  <h4 className="font-semibold text-lg">{project.name}</h4>
+              {projects.map((item) => (
+                <div key={item.project._id} className="border rounded-md p-4">
+                  <h4 className="font-semibold text-lg">{item.project.name}</h4>
 
-                  <p className="text-gray-500 mt-1">{project.description}</p>
+                  <p className="text-gray-500 mt-1">
+                    {item.project.description}
+                  </p>
+
+                  <p className="text-sm text-blue-600 mt-2">
+                    Role: {item.role}
+                  </p>
                 </div>
               ))}
             </div>
