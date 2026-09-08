@@ -135,10 +135,42 @@ const getTaskById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, task[0], "Task fetched successfully"));
 });
 const updateTask = asyncHandler(async (req, res) => {
-  //chai
+  const { taskId } = req.params;
+  const { title, description, assignedTo, status } = req.body;
+
+  const task = await Task.findById(taskId);
+
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  task.title = title || task.title;
+  task.description = description || task.description;
+  task.assignedTo = assignedTo
+    ? new mongoose.Types.ObjectId(assignedTo)
+    : task.assignedTo;
+  task.status = status || task.status;
+
+  await task.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, task, "Task updated successfully"));
 });
 const deleteTask = asyncHandler(async (req, res) => {
-  //chai
+  const { taskId } = req.params;
+
+  const task = await Task.findById(taskId);
+
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  await Task.findByIdAndDelete(taskId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Task deleted successfully"));
 });
 const createSubTask = asyncHandler(async (req, res) => {
   //chai
