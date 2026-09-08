@@ -108,7 +108,11 @@ function Dashboard() {
           {!loading && !error && projects.length > 0 && (
             <div className="space-y-3">
               {projects.map((item) => (
-                <div key={item.project._id} className="border rounded-md p-4">
+                <div
+                  key={item.project._id}
+                  onClick={() => navigate(`/projects/${item.project._id}`)}
+                  className="border rounded-md p-4 cursor-pointer hover:bg-gray-50"
+                >
                   <h4 className="font-semibold text-lg">{item.project.name}</h4>
 
                   <p className="text-gray-500 mt-1">

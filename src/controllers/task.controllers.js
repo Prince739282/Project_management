@@ -7,7 +7,6 @@ import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import mongoose from "mongoose";
 import { AvailableUserRole, UserRolesEnum } from "../utils/constants.js";
-import { pipeline } from "nodemailer/lib/xoauth2/index.js";
 
 const getTasks = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
@@ -20,7 +19,7 @@ const getTasks = asyncHandler(async (req, res) => {
   }).populate("assignedTo", "avatar username fullName");
 
   return res
-    .staus(201)
+    .status(200)
     .json(new ApiResponse(201, tasks, "Task fetched successfully"));
 });
 const createTask = asyncHandler(async (req, res) => {
@@ -54,7 +53,7 @@ const createTask = asyncHandler(async (req, res) => {
   });
 
   return res
-    .staus(201)
+    .status(201)
     .json(new ApiResponse(201, task, "Task created successfully"));
 });
 const getTaskById = asyncHandler(async (req, res) => {
@@ -74,10 +73,12 @@ const getTaskById = asyncHandler(async (req, res) => {
         as: "assignedTo",
         pipeline: [
           {
-            _id: 1,
-            username: 1,
-            fullName: 1,
-            avatar: 1,
+            $project: {
+              _id: 1,
+              username: 1,
+              fullName: 1,
+              avatar: 1,
+            },
           },
         ],
       },
