@@ -30,6 +30,21 @@ function Dashboard() {
     fetchProjects();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout");
+
+      localStorage.removeItem("accessToken");
+
+      navigate("/login");
+    } catch (error) {
+      console.log("Logout error:", error);
+
+      localStorage.removeItem("accessToken");
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
@@ -39,7 +54,10 @@ function Dashboard() {
         <div className="flex items-center gap-4">
           <span className="text-gray-600">Welcome back!</span>
 
-          <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+          >
             Logout
           </button>
         </div>
