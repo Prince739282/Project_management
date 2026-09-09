@@ -13,6 +13,7 @@ function ProjectDetails() {
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(true);
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
   const [taskForm, setTaskForm] = useState({
     title: "",
@@ -99,6 +100,48 @@ function ProjectDetails() {
     }
   };
 
+  const updateTask = async (taskId) => {
+    try {
+      const response = await api.put(
+        `/tasks/${projectId}/tasks/${taskId}`,
+        taskForm,
+      );
+
+      setTasks(
+        tasks.map((task) => (task._id === taskId ? response.data.data : task)),
+      );
+
+      setEditingTaskId(null);
+
+      setTaskForm({
+        title: "",
+        description: "",
+        assignedTo: "",
+        status: "todo",
+      });
+    } catch (error) {
+      console.log("Update task error:", error);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this task?",
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      await api.delete(`/tasks/${projectId}/tasks/${taskId}`);
+
+      setTasks(tasks.filter((task) => task._id !== taskId));
+    } catch (error) {
+      console.log("Delete task error:", error);
+    }
+  };
+
   if (loading) {
     return <p className="p-6">Loading project...</p>;
   }
@@ -158,7 +201,18 @@ function ProjectDetails() {
 
         {/* Create Task Form */}
         {showTaskForm && (
-          <form onSubmit={createTask} className="border rounded-md p-4 mb-6">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+
+              if (editingTaskId) {
+                updateTask(editingTaskId);
+              } else {
+                createTask(e);
+              }
+            }}
+            className="border rounded-md p-4 mb-6"
+          >
             <input
               type="text"
               name="title"
@@ -207,7 +261,7 @@ function ProjectDetails() {
               type="submit"
               className="bg-green-600 text-white px-4 py-2 rounded-md"
             >
-              Create Task
+              {editingTaskId ? "Update Task" : "Create Task"}
             </button>
           </form>
         )}
@@ -228,6 +282,29 @@ function ProjectDetails() {
                 <p className="text-sm text-blue-600 mt-2">
                   Status: {task.status}
                 </p>
+                <button
+                  onClick={() => {
+                    setEditingTaskId(task._id);
+
+                    setTaskForm({
+                      title: task.title,
+                      description: task.description || "",
+                      assignedTo: task.assignedTo?._id || "",
+                      status: task.status,
+                    });
+
+                    setShowTaskForm(true);
+                  }}
+                  className="text-blue-600 text-sm mt-2 hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteTask(task._id)}
+                  className="text-red-600 text-sm mt-2 ml-4 hover:underline"
+                >
+                  Delete
+                </button>
 
                 {task.assignedTo && (
                   <p className="text-sm text-gray-500 mt-1">
