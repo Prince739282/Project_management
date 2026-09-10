@@ -38,48 +38,34 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo / Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-white rounded-2xl shadow-lg mb-4">
-            <span className="text-2xl font-bold text-blue-600">P</span>
-          </div>
+          <h1 className="text-3xl font-bold text-blue-600">ProjectFlow</h1>
 
-          <h1 className="text-3xl font-bold text-white">ProjectFlow</h1>
-
-          <p className="text-blue-100 mt-2">
-            Manage your projects. Grow your productivity.
-          </p>
+          <p className="text-gray-500 mt-2">Manage your projects easily</p>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Welcome back 👋
-            </h2>
+        <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+          <h2 className="text-2xl font-semibold text-gray-800">Login</h2>
 
-            <p className="text-gray-500 mt-1">
-              Login to continue to your workspace
-            </p>
-          </div>
+          <p className="text-gray-500 text-sm mt-1 mb-6">
+            Welcome back! Please login to your account.
+          </p>
 
-          {/* Error */}
           {error && (
-            <div className="mb-5 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+            <div className="mb-5 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin}>
-            {/* Email */}
             <div className="mb-5">
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email address
+                Email
               </label>
 
               <input
@@ -87,25 +73,27 @@ function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="Enter your email"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-md outline-none focus:border-blue-500"
               />
             </div>
 
-            {/* Password */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex justify-between mb-2">
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700"
                 >
                   Password
                 </label>
 
-                <span className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-blue-600 hover:underline"
+                >
                   Forgot password?
-                </span>
+                </Link>
               </div>
 
               <div className="relative">
@@ -116,46 +104,41 @@ function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="w-full px-4 py-3 pr-20 border border-gray-300 rounded-xl outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full px-3 py-2.5 pr-16 border border-gray-300 rounded-md outline-none focus:border-blue-500"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-blue-600 hover:text-blue-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-600"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
             </div>
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md transition"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
-          {/* Signup */}
-          <div className="text-center mt-6">
-            <p className="text-gray-500 text-sm">
-              Don't have an account?{" "}
-              <Link
-                to="/signup"
-                className="text-blue-600 font-semibold hover:text-blue-700"
-              >
-                Sign Up
-              </Link>
-            </p>
-          </div>
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-blue-600 font-medium hover:underline"
+            >
+              Sign Up
+            </Link>
+          </p>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-blue-100 text-xs mt-6">
-          © 2026 ProjectFlow. All rights reserved.
+        <p className="text-center text-xs text-gray-400 mt-6">
+          © 2026 ProjectFlow
         </p>
       </div>
     </div>
