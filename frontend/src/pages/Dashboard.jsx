@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const navigate = useNavigate();
+
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,11 +13,6 @@ function Dashboard() {
     const fetchProjects = async () => {
       try {
         const response = await api.get("/projects/");
-
-        console.log("Full response:", response.data);
-        console.log("Projects data:", response.data.data);
-        console.log("First project ID:", response.data.data?.[0]?._id);
-        console.log("First project:", response.data.data?.[0]);
 
         setProjects(response.data.data || []);
       } catch (error) {
@@ -103,7 +99,13 @@ function Dashboard() {
         {/* Projects */}
         <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-xl font-bold">Recent Projects</h3>
+            <div>
+              <h3 className="text-xl font-bold">Recent Projects</h3>
+
+              <p className="text-sm text-gray-500 mt-1">
+                Click a project to manage tasks, members and details.
+              </p>
+            </div>
 
             <button
               onClick={() => navigate("/projects/create")}
@@ -129,17 +131,29 @@ function Dashboard() {
                 <div
                   key={item.project._id}
                   onClick={() => navigate(`/projects/${item.project._id}`)}
-                  className="border rounded-md p-4 cursor-pointer hover:bg-gray-50"
+                  className="border border-gray-200 rounded-lg p-5 cursor-pointer hover:border-blue-400 hover:shadow-sm hover:bg-blue-50/30 transition"
                 >
-                  <h4 className="font-semibold text-lg">{item.project.name}</h4>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-lg text-gray-800">
+                        {item.project.name}
+                      </h4>
 
-                  <p className="text-gray-500 mt-1">
-                    {item.project.description}
-                  </p>
+                      <p className="text-gray-500 mt-1">
+                        {item.project.description}
+                      </p>
+                    </div>
 
-                  <p className="text-sm text-blue-600 mt-2">
-                    Role: {item.role}
-                  </p>
+                    <span className="text-blue-600 text-xl ml-4">→</span>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="text-sm text-blue-600">Role: {item.role}</p>
+
+                    <p className="text-xs text-gray-400">
+                      Click to manage project
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

@@ -5,11 +5,13 @@ import Dashboard from "./pages/Dashboard";
 import CreateProject from "./pages/CreateProject";
 import ProjectDetails from "./pages/ProjectDetails";
 
+
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<Login Page />} />
+      <Route path="/login" element={<Login/>} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/projects/create" element={<CreateProject />} />
