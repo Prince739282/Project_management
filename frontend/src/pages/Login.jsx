@@ -1,45 +1,36 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     setError("");
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", formData);
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
-      console.log("Login response:", response.data);
+      const accessToken = response.data?.data?.accessToken;
 
-      const accessToken = response.data.data.accessToken;
-
-      localStorage.setItem("accessToken", accessToken);
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+      }
 
       navigate("/dashboard");
     } catch (error) {
-      console.log("Login error:", error);
-      console.log("Response:", error.response);
-
       setError(error.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
@@ -47,62 +38,124 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-md">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
-
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Logo / Brand */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-white rounded-2xl shadow-lg mb-4">
+            <span className="text-2xl font-bold text-blue-600">P</span>
           </div>
 
-          <div>
-            <label className="block mb-1 font-medium">Password</label>
+          <h1 className="text-3xl font-bold text-white">ProjectFlow</h1>
 
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <p className="text-blue-100 mt-2">
+            Manage your projects. Grow your productivity.
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Welcome back 👋
+            </h2>
+
+            <p className="text-gray-500 mt-1">
+              Login to continue to your workspace
+            </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+          {/* Error */}
+          {error && (
+            <div className="mb-5 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
 
-        <p className="text-center mt-4 text-gray-600">
-          Don't have an account?{" "}
-          <button
-            onClick={() => navigate("/signup")}
-            className="text-blue-600 hover:underline"
-          >
-            Sign Up
-          </button>
+          <form onSubmit={handleLogin}>
+            {/* Email */}
+            <div className="mb-5">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Email address
+              </label>
+
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+
+                <span className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
+                  Forgot password?
+                </span>
+              </div>
+
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full px-4 py-3 pr-20 border border-gray-300 rounded-xl outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-blue-600 hover:text-blue-700"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+
+          {/* Signup */}
+          <div className="text-center mt-6">
+            <p className="text-gray-500 text-sm">
+              Don't have an account?{" "}
+              <Link
+                to="/signup"
+                className="text-blue-600 font-semibold hover:text-blue-700"
+              >
+                Sign Up
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-blue-100 text-xs mt-6">
+          © 2026 ProjectFlow. All rights reserved.
         </p>
       </div>
     </div>
